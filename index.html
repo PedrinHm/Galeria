@@ -20,54 +20,38 @@
     </div>
 
     <script>
-        function embaralharLista(lista) {
-            for (let i = lista.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [lista[i], lista[j]] = [lista[j], lista[i]];
-            }
-        }
-
         fetch('/imagens')
             .then(res => res.json())
-            .then(imagens => {
-                if (imagens.length === 0) return;
-
-                embaralharLista(imagens);
+            .then(imagensRecebidas => { // Mudamos o nome para evitar conflitos
+                if (!imagensRecebidas || imagensRecebidas.length === 0) {
+                    console.error("Nenhuma imagem encontrada.");
+                    return;
+                }
 
                 const container = document.getElementById('slideshow-container');
-                container.innerHTML = ''; // Limpa o container
+                container.innerHTML = '';
 
-                // Cria o elemento que será o rolo de filme
                 const filmRoll = document.createElement('div');
                 filmRoll.className = 'film-roll';
 
-                // --- LÓGICA DO ROLO DE FILME ---
+                // 1. Adiciona e 2. Duplica (para o loop infinito)
+                // Como o Cloudinary envia a URL completa, usamos direto no src
+                const listaDuplicada = [...imagensRecebidas, ...imagensRecebidas];
 
-                // 1. Adiciona todas as imagens ao rolo
-                imagens.forEach(img => {
+                listaDuplicada.forEach(url => {
                     const div = document.createElement('div');
                     div.className = 'meu-slide';
-                    div.innerHTML = `<img src="images/${img}" alt="Foto">`;
+                    div.innerHTML = `<img src="${url}" alt="Foto">`;
                     filmRoll.appendChild(div);
                 });
 
-                // 2. DUPLICA as imagens para o loop infinito
-                imagens.forEach(img => {
-                    const div = document.createElement('div');
-                    div.className = 'meu-slide';
-                    div.innerHTML = `<img src="images/${img}" alt="Foto">`;
-                    filmRoll.appendChild(div);
-                });
-
-                // 3. Adiciona o rolo completo ao container na página
                 container.appendChild(filmRoll);
 
-                // 4. Calcula e aplica a animação
-                const segundosPorFoto = 3; // Mude aqui para acelerar ou desacelerar
-                const duracaoTotal = imagens.length * segundosPorFoto;
-
+                const segundosPorFoto = 3;
+                const duracaoTotal = imagensRecebidas.length * segundosPorFoto;
                 filmRoll.style.animation = `scrollFilm ${duracaoTotal}s linear infinite`;
-            });
+            })
+            .catch(err => console.error("Erro ao carregar imagens:", err));
     </script>
 
     <script>
