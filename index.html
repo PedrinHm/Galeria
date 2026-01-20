@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Slideshow</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="hearts-container"></div>
+
+    <h1 class="titulo-fofo">Aqui, a gente tá sempre perto</h1>
+
+    <div class="slideshow-container" id="slideshow-container">
+    </div>
+
+    <script>
+        function embaralharLista(lista) {
+            for (let i = lista.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [lista[i], lista[j]] = [lista[j], lista[i]];
+            }
+        }
+
+        fetch('/imagens')
+            .then(res => res.json())
+            .then(imagens => {
+                if (imagens.length === 0) return;
+
+                embaralharLista(imagens);
+
+                const container = document.getElementById('slideshow-container');
+                container.innerHTML = ''; // Limpa o container
+
+                // Cria o elemento que será o rolo de filme
+                const filmRoll = document.createElement('div');
+                filmRoll.className = 'film-roll';
+
+                // --- LÓGICA DO ROLO DE FILME ---
+
+                // 1. Adiciona todas as imagens ao rolo
+                imagens.forEach(img => {
+                    const div = document.createElement('div');
+                    div.className = 'meu-slide';
+                    div.innerHTML = `<img src="images/${img}" alt="Foto">`;
+                    filmRoll.appendChild(div);
+                });
+
+                // 2. DUPLICA as imagens para o loop infinito
+                imagens.forEach(img => {
+                    const div = document.createElement('div');
+                    div.className = 'meu-slide';
+                    div.innerHTML = `<img src="images/${img}" alt="Foto">`;
+                    filmRoll.appendChild(div);
+                });
+
+                // 3. Adiciona o rolo completo ao container na página
+                container.appendChild(filmRoll);
+
+                // 4. Calcula e aplica a animação
+                const segundosPorFoto = 3; // Mude aqui para acelerar ou desacelerar
+                const duracaoTotal = imagens.length * segundosPorFoto;
+
+                filmRoll.style.animation = `scrollFilm ${duracaoTotal}s linear infinite`;
+            });
+    </script>
+
+    <script>
+        // O script dos corações e frases permanece o mesmo
+        const heartsContainer = document.querySelector('.hearts-container');
+
+        const frasesFofas = [
+            "Te amo",
+            "Você é tudo",
+            "Tem um pedaço do meu peito bem colado ao teu.",
+            "Eu busco às vezes nos detalhes encontrar você",
+            "Saiba que eu te amo, amo noite e dia!",
+            "Pra falar do amor de verdade, vou começar pela melhor metade.",
+            "Mas e o amor? O que é senão um monte de gostar?",
+            "O amor, quando nasce forte, tem pressa de ser eterno.",
+        ];
+
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            heart.innerHTML = '❤';
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.animationDuration = Math.random() * 3 + 5 + 's';
+            heart.style.fontSize = Math.random() * 32 + 8 + 'px';
+            heartsContainer.appendChild(heart);
+            setTimeout(() => { heart.remove(); }, 8000);
+        }
+
+        function createFrase() {
+            const frase = document.createElement('div');
+            frase.classList.add('frase');
+            const fraseAleatoria = frasesFofas[Math.floor(Math.random() * frasesFofas.length)];
+            frase.innerHTML = fraseAleatoria;
+            frase.style.left = Math.random() * 90 + 'vw';
+            frase.style.animationDuration = Math.random() * 5 + 7 + 's';
+            frase.style.fontSize = Math.random() * 15 + 12 + 'px';
+            heartsContainer.appendChild(frase);
+            setTimeout(() => { frase.remove(); }, 12000);
+        }
+
+        setInterval(createHeart, 50);
+        setInterval(createFrase, 1500);
+    </script>
+</body>
+
+</html>
